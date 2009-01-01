@@ -1,0 +1,93 @@
+= !AbbrMacro =
+
+== Description ==
+
+AbbrMacro returns an <abbr> or <acronym> element with a title attribute.
+
+If you've used InlineMacro to create abbreviation or acronym elements in your
+[WikiFormatting formatted] wiki pages, you probably quickly realized how tedious
+that can be. The !AbbrMacro package is designed to alleviate all that.
+
+It accepts keyword syntax only:
+
+{{{
+[[Abbr(abbr=XYZ,title=Xenon Yeti Zulu,<tag=abbr|acronym>)]]
+}}}
+
+Where the `tag` keyword is optional and defaults to `acronym`. Why is acronym
+the default? For several reasons. First, most users are after acronyms (and as
+far as I know there are no plans for a `initialism` element). Second, Internet
+Explorer through version 8.x does not support the `<abbr>` element.
+
+== Definitions File ==
+
+!AbbrMacro is designed to be rolled out in phases. The first and simpliest use
+case I've already described. But even that can become tedious, especially if
+you use the same acronyms over and over. The second phase will introduce a
+user-defined text file of abbr/title pairs which will allow the omission
+of the title keyword. Assuming, that is, there is a matching abbreviation in
+the definition file.
+
+To configure the location of the definitions file, add the following  entry to
+your project `trac.ini`:
+
+{{{
+[abbreviations]
+file = /path/to/your/abbreviations/file
+}}}
+
+The file must be readable (and eventually writable, see below) by your Web
+server in order for this feature to work. Like all Python/Trac configuration
+files, strings beginning with a `#` (pound) character are treated as commments
+and will be ignored.
+
+The format of the definitions file couldn't be simpler:
+
+{{{
+PEP = Python Enhancement Proposal
+PHP = Hypertext Preprocesor
+RFC = Request For Comments
+...
+}}}
+
+Where leading and trailing whitespace is removed.
+
+A third and final phase will allow the user to edit this file from within the
+wiki, similar to the InterMapTxt page for InterWiki links.
+
+== Installation ==
+
+Download the [zipfile] from here or from [ Trac Hacks], unzip the archive to a
+temporary location, visit the `0.11` folder and run:
+
+{{{
+python setup.py bdist_egg
+cp dist/*.egg /trac/env/Project/plugins
+}}}
+
+== Configuration ==
+
+Enable the macro in:
+
+/trac/env/Project/conf/trac.ini:
+
+{{{
+[components]
+abbr.* = enabled
+}}}
+
+You may have to restart your Web server.
+
+== Example ==
+
+{{{
+[[Abbr(abbr=PEP,title=Python Enhancement Proposal)]]
+}}}
+
+== Source ==
+
+ * Browse the source at: [http://github.com/dwclifton/tracabbrmacro/tree/master GitHub].
+ * Public clone URL:
+{{{
+git clone git://github.com/dwclifton/tracabbrmacro.git
+}}}
