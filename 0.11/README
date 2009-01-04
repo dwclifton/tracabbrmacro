@@ -78,6 +78,25 @@ abbr.* = enabled
 
 You may have to restart your Web server.
 
+== Style ==
+
+No sense doing it without style, here's mine.
+
+{{{
+/* acronyms and abbrs */
+
+abbr,
+acronym {
+  border-bottom: none;
+  cursor: default;
+  color: #ad2524;
+}
+abbr:hover,
+acronym:hover {
+  border-bottom: 1px dotted #ad2524;
+}
+}}}
+
 == Example ==
 
 {{{
