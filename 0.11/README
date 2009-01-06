@@ -1,64 +1,124 @@
-= !AbbrMacro =
+= eAbbrMacro =
 
 == Description ==
 
 AbbrMacro returns an <abbr> or <acronym> element with a title attribute.
 
-If you've used InlineMacro to create abbreviation or acronym elements in your
+If you've used InlineMacro to create abbreviations or acronyms in your
 [WikiFormatting formatted] wiki pages, you probably quickly realized how tedious
-that can be. The !AbbrMacro package is designed to alleviate all that.
+it can be. The !AbbrMacro package is designed to alleviate this issue.
 
 It accepts keyword syntax only:
 
 {{{
-[[Abbr(abbr=XYZ,title=Xenon Yeti Zulu,<tag=abbr|acronym>)]]
+[[Abbr(key=XYZ,title=Xenon Yeti Zulu,<tag=abbr|acronym>)]]
 }}}
 
-Where the `tag` keyword is optional and defaults to `acronym`. Why is acronym
-the default? For several reasons. First, most users are after acronyms (and as
-far as I know there are no plans for a `initialism` element). Second, Internet
-Explorer through version 8.x does not support the `<abbr>` element.
+Where `key` is the element content, `title` is required, and the `tag` keyword
+is optional. The element type (tag) will default to `acronym` if omitted. Why is
+acronym the default? For several reasons. First, most users are after acronyms
+(and as far as I know there are no plans for an `initialism` element). Second,
+Internet Explorer before version 7.0 does not support the `<abbr>` element. It
+won't do any harm to use them with IE 6 and below, but these browsers do not
+allow you to style the element with CSS and they don't display the title
+attribute as a tooltip.
 
-== Definitions File ==
+Many HTML authors mistakenly refer to an element as a "tag." For a review on the
+syntax and nomenclature of Web element markup, visit the Wikipedia
+[http://en.wikipedia.org/wiki/HTML_element" HTML Element] article, or this quick
+synopsis will help.
 
-!AbbrMacro is designed to be rolled out in phases. The first and simpliest use
-case I've already described. But even that can become tedious, especially if
-you use the same acronyms over and over. The second phase will introduce a
-user-defined text file of abbr/title pairs which will allow the omission
-of the title keyword. Assuming, that is, there is a matching abbreviation in
-the definition file.
+Syntactically, HTML elements are constructed with:
 
-To configure the location of the definitions file, add the following  entry to
+ * A `start tag` marking the beginning of an element.
+ * Any number of valid `attributes` (and their associated values in quotes).
+ * Some amount of `content` (characters and other elements).
+ * An `end tag`.
+
+'''Notes''':
+
+ * In general, empty elements do not have an end tag nor do they contain content.
+ * HTML elements that include attributes do so in their start tags, which define additional properties and behavior.
+ * The end tag is optional for some elements.
+ * These rules vary depending on what `DOCTYPE` you are serving.
+
+There has been a long and sometimes heated discussion on the `<abbr>` and `<acronym>`
+elements around the Web. A good article at Juicy Studios was written by my friend
+ Pamela Berman: [http://juicystudio.com/article/abbreviations-acronyms.php Abbreviations are a Breeze].
+
+== Dictionary File ==
+
+`AbbrMacro` is designed to be rolled out in phases. The first and simpliest use
+case I've already described. But even that can become tedious, especially if you
+use the same acronyms over and over. The second phase introduces a user-defined
+plain text dictionary file of key/value (content/title) pairs, which permits the
+omission of the title keyword. Assuming, that is, there is a matching abbreviation
+in the dictionary file. You may also include the title attribute using the macro
+even if the element is defined in the dictionary file, the macro title keyword
+will take precedence. If you omit the title using the macro, and the element is
+''not'' defined in the dictionary, the macro will issue a error message and exit.
+
+To configure the location of the dictionary file, add the following  entry to
 your project `trac.ini`:
 
 {{{
-[abbreviations]
+[abbr]
 file = /path/to/your/abbreviations/file
 }}}
 
-The file must be readable (and eventually writable, see below) by your Web
-server in order for this feature to work. Like all Python/Trac configuration
-files, strings beginning with a `#` (pound) character are treated as commments
-and will be ignored.
+The file must be readable (and eventually writable, see below) by your Web server
+in order for this feature to work.
 
-The format of the definitions file couldn't be simpler:
+The format of the dictionary file couldn't be simpler:
 
 {{{
+[acronym]
 PEP = Python Enhancement Proposal
 PHP = Hypertext Preprocesor
 RFC = Request For Comments
 ...
+
+[abbr]
+...
 }}}
 
-Where leading and trailing whitespace is removed.
+Where leading and trailing whitespace are removed. Notice that there is a uncanny
+similarity between the dictionary file and trac.ini? This is no accident of course,
+each one has sections followed by name=value pairs. Sections other than [abbr] and
+[acronym] in the dictionary file are ignored, and there is no rule you must have
+both. I tend to only use acronyms for this sort of thing, and to help get you
+started here is an example [AbbrMacro/AbbrMap AbbrMap]. Like all Python/Trac files,
+strings beginning with a `#` (pound) character are treated as comments and are
+ignored. If you're going to use Unicode characters in your dictionary (typically
+in the title attribute), open the file, as always, with:
 
-A third and final phase will allow the user to edit this file from within the
-wiki, similar to the InterMapTxt page for InterWiki links.
+{{{
+# -*- coding: utf-8 -*-
+}}}
+
+{{{
+#!html
+<div class="system-message">
+<img src="/TracHacks/raw-attachment/wiki/WikiStart/bug.gif" class="icon" alt="bug" />
+<strong>Warning</strong>: Since abbreviations and acronyms kept in the dictionary
+file are stored in memory as unique key=value pairs, duplicates keys will cause a
+collision. If this happens, one will overwrite the other. However, since the keys
+are case-sensitive, in practice this should not be a issue&mdash;just something to
+keep in mind when you are editing your dictionary file.
+</div>
+}}}
+
+== !AbbrMapTxt ==
+
+A third and final phase will allow the user to edit this file from within the wiki,
+similar to the InterMapTxt page for InterWiki links.
 
 == Installation ==
 
-Download the [zipfile] from here or from [ Trac Hacks], unzip the archive to a
-temporary location, visit the `0.11` folder and run:
+#-------------------------------------------------------------------------------
+
+Download the [/raw-attachment/wiki/AbbrMacro/abbrmacro.zip zipfile], unzip the
+archive to a temporary location, visit the `0.11` folder and run:
 
 {{{
 python setup.py bdist_egg
@@ -76,6 +136,8 @@ Enable the macro in:
 abbr.* = enabled
 }}}
 
+See [#DictionaryFile Dictionary File] above if you plan on using this feature.
+
 You may have to restart your Web server.
 
 == Style ==
@@ -83,24 +145,32 @@ You may have to restart your Web server.
 No sense doing it without style, here's mine.
 
 {{{
+#!css
 /* acronyms and abbrs */
 
 abbr,
 acronym {
   border-bottom: none;
   cursor: default;
-  color: #ad2524;
+  color: #309;
 }
 abbr:hover,
 acronym:hover {
-  border-bottom: 1px dotted #ad2524;
+  border-bottom: 1px dotted #309;
 }
 }}}
 
 == Example ==
 
+'''Macro''':
 {{{
-[[Abbr(abbr=PEP,title=Python Enhancement Proposal)]]
+[[Abbr(key=PEP,title=Python Enhancement Proposal)]]
+}}}
+
+'''Displays''':
+{{{
+#!html
+<acronym title="Python Enhancement Proposal">PEP</acronym>
 }}}
 
 == Source ==
